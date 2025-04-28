@@ -64,7 +64,7 @@ yarn build
 yarn start:dev
 ```
 
-The application will be available at `http://localhost:3000`.
+The application will be available at `http://localhost:3100`.
 
 ## Testing
 
@@ -79,8 +79,35 @@ cd backend
 
 ```bash
 cd frontend
-yarn test
+# Run unit tests
+yarn test:unit
+
+# Run component tests (requires custom configuration)
+# Create a temporary Jest config file for component tests:
+echo 'module.exports = {
+  roots: ["<rootDir>/src/test"],
+  testRegex: "(/src/test/.*|\\.(test|spec))\\.(ts|tsx|js|jsx)$",
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
+  testEnvironment: "jsdom",
+  transform: {
+    "^.+\\.(ts|tsx)$": "ts-jest",
+  },
+  moduleNameMapper: {
+    "\\.(css|less|scss|sass)$": "<rootDir>/src/test/__mocks__/styleMock.js",
+    "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/__mocks__/fileMock.js"
+  }
+};' > jest.component.config.js
+
+# Create mock files
+mkdir -p src/test/__mocks__
+echo 'module.exports = {};' > src/test/__mocks__/styleMock.js
+echo 'module.exports = "test-file-stub";' > src/test/__mocks__/fileMock.js
+
+# Run component tests
+yarn jest --config jest.component.config.js src/test/modules
 ```
+
+
 
 ## API Documentation
 

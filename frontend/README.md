@@ -47,12 +47,43 @@ yarn build:prod
 yarn start
 ```
 
-The application will be available at `http://localhost:3000`.
+The application will be available at `http://localhost:3100`.
 
 ### Running Tests
 
+#### Unit Tests
 ```bash
-yarn test
+yarn test:unit
+```
+
+This runs the basic unit tests in the `src/test/unit` directory.
+
+#### Component Tests
+The component tests are located in `src/test/modules` and require a custom Jest configuration to run:
+
+```bash
+# Create a temporary Jest config file for component tests:
+echo 'module.exports = {
+  roots: ["<rootDir>/src/test"],
+  testRegex: "(/src/test/.*|\\.(test|spec))\\.(ts|tsx|js|jsx)$",
+  moduleFileExtensions: ["ts", "tsx", "js", "jsx", "json"],
+  testEnvironment: "jsdom",
+  transform: {
+    "^.+\\.(ts|tsx)$": "ts-jest",
+  },
+  moduleNameMapper: {
+    "\\.(css|less|scss|sass)$": "<rootDir>/src/test/__mocks__/styleMock.js",
+    "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/src/test/__mocks__/fileMock.js"
+  }
+};' > jest.component.config.js
+
+# Create mock files
+mkdir -p src/test/__mocks__
+echo 'module.exports = {};' > src/test/__mocks__/styleMock.js
+echo 'module.exports = "test-file-stub";' > src/test/__mocks__/fileMock.js
+
+# Run component tests
+yarn jest --config jest.component.config.js src/test/modules
 ```
 
 ## Project Structure
@@ -137,9 +168,18 @@ The application follows accessibility best practices:
 
 ## Testing
 
-Components are tested using Jest and React Testing Library, focusing on:
+Components are tested using Jest and React Testing Library. Currently, the test coverage includes:
 
+- **TaskCard Component**: Fully tested for rendering, user interactions, and styling
+- **Other Components**: Not yet covered by tests
+- **TaskService**: No unit tests for API integration yet
+
+The existing tests focus on:
 - Component rendering
 - User interactions
-- API integration
-- Error handling
+- Styling and CSS classes
+
+Areas for test improvement:
+- Add tests for TaskService to verify API integration
+- Add tests for TaskList, TaskForm, and DeleteConfirmation components
+- Add tests for error handling scenarios
