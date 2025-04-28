@@ -40,7 +40,7 @@ public class Task {
     private TaskStatus status;
 
     @NotNull(message = "Due date is required")
-    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm")
     @Column(nullable = false)
     private LocalDateTime dueDate;
 

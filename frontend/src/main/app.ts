@@ -8,6 +8,7 @@ import cookieParser from 'cookie-parser';
 import express from 'express';
 import { glob } from 'glob';
 import favicon from 'serve-favicon';
+import { createProxyMiddleware } from 'http-proxy-middleware';
 
 const { setupDev } = require('./development');
 
@@ -28,6 +29,13 @@ app.use((req, res, next) => {
   res.setHeader('Cache-Control', 'no-cache, max-age=0, must-revalidate, no-store');
   next();
 });
+
+// Proxy API requests to the backend
+app.use('/api', createProxyMiddleware({
+  target: 'http://localhost:8080',
+  changeOrigin: true,
+  secure: false
+}));
 
 glob
   .sync(__dirname + '/routes/**/*.+(ts|js)')

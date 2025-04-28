@@ -13,12 +13,12 @@ interface TaskFormProps {
 /**
  * Component for creating and editing tasks
  */
-const TaskForm: React.FC<TaskFormProps> = ({ 
-  isOpen, 
-  onClose, 
-  onSubmit, 
-  title, 
-  initialData 
+const TaskForm: React.FC<TaskFormProps> = ({
+  isOpen,
+  onClose,
+  onSubmit,
+  title,
+  initialData
 }) => {
   // Form state
   const [formData, setFormData] = useState({
@@ -102,14 +102,17 @@ const TaskForm: React.FC<TaskFormProps> = ({
    */
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (validateForm()) {
-      onSubmit({
+      // Ensure the date is in the correct format for the API
+      const formattedData = {
         title: formData.title,
         description: formData.description || undefined,
         status: formData.status,
-        dueDate: formData.dueDate
-      });
+        dueDate: formData.dueDate // Format: yyyy-MM-dd'T'HH:mm
+      };
+      console.log('Submitting task with data:', formattedData);
+      onSubmit(formattedData);
     }
   };
 
@@ -121,8 +124,8 @@ const TaskForm: React.FC<TaskFormProps> = ({
       <div className="modal__content">
         <div className="modal__header">
           <h2>{title}</h2>
-          <button 
-            className="modal__close" 
+          <button
+            className="modal__close"
             onClick={onClose}
             aria-label="Close modal"
           >

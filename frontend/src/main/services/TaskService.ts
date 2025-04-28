@@ -1,7 +1,8 @@
 import axios from 'axios';
 import { Task, TaskRequest, TaskStatus } from '../types/Task';
 
-const API_URL = 'http://localhost:8080/api/tasks';
+// Use a relative URL to the backend API (will be proxied through Express)
+const API_URL = '/api/tasks';
 
 /**
  * Service for interacting with the Task Management API
@@ -13,10 +14,13 @@ export class TaskService {
    */
   static async getAllTasks(): Promise<Task[]> {
     try {
+      console.log('Fetching tasks from:', API_URL);
       const response = await axios.get<Task[]>(API_URL);
+      console.log('Tasks response:', response);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error fetching tasks:', error);
+      console.error('Error details:', error.response?.data, error.response?.status, error.response?.headers);
       throw error;
     }
   }
@@ -43,10 +47,13 @@ export class TaskService {
    */
   static async createTask(taskData: TaskRequest): Promise<Task> {
     try {
+      console.log('Creating task with data:', taskData);
       const response = await axios.post<Task>(API_URL, taskData);
+      console.log('Create task response:', response);
       return response.data;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error creating task:', error);
+      console.error('Error details:', error.response?.data, error.response?.status, error.response?.headers);
       throw error;
     }
   }
