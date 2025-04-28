@@ -1,0 +1,14 @@
+{% extends "template.njk" %}
+
+{% block pageTitle %}
+  {{ pageTitle }}
+{% endblock %}
+
+{% block content %}
+  <div id="task-management-root"></div>
+{% endblock %}
+
+{% block bodyEnd %}
+  {{ super() }}
+  <script src="/js/task-management.js"></script>
+{% endblock %}

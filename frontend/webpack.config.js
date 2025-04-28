@@ -11,20 +11,23 @@ const filename = `[name]${fileNameSuffix}.js`;
 
 module.exports = {
   plugins: [...govukFrontend.plugins, ...scss.plugins, ...HtmlWebpack.plugins],
-  entry: path.resolve(sourcePath, 'index.ts'),
+  entry: {
+    main: path.resolve(sourcePath, 'index.ts'),
+    'task-management': path.resolve(sourcePath, 'task-management/index.ts')
+  },
   mode: devMode ? 'development' : 'production',
   module: {
     rules: [
       ...scss.rules,
       {
-        test: /\.ts$/,
+        test: /\.(ts|tsx)$/,
         use: 'ts-loader',
         exclude: /node_modules/,
       },
     ],
   },
   resolve: {
-    extensions: ['.ts', '.js'],
+    extensions: ['.ts', '.tsx', '.js', '.jsx'],
   },
   output: {
     path: path.resolve(__dirname, 'src/main/public/'),
