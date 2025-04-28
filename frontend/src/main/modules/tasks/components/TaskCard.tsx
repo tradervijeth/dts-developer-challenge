@@ -29,6 +29,22 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
   };
 
   /**
+   * Get CSS class for the card based on task status
+   */
+  const getCardClass = (status: TaskStatus): string => {
+    switch (status) {
+      case TaskStatus.TODO:
+        return 'task-card--todo';
+      case TaskStatus.IN_PROGRESS:
+        return 'task-card--in-progress';
+      case TaskStatus.COMPLETED:
+        return 'task-card--completed';
+      default:
+        return '';
+    }
+  };
+
+  /**
    * Format the status display name from the enum value
    */
   const formatStatus = (status: TaskStatus): string => {
@@ -55,8 +71,36 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
     }
   };
 
+  /**
+   * Calculate days remaining until due date
+   */
+  const getDaysRemaining = (dueDateString: string): string => {
+    try {
+      const dueDate = new Date(dueDateString);
+      const today = new Date();
+
+      // Reset time part for accurate day calculation
+      today.setHours(0, 0, 0, 0);
+      const dueDay = new Date(dueDate);
+      dueDay.setHours(0, 0, 0, 0);
+
+      const diffTime = dueDay.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      if (diffDays < 0) {
+        return `Overdue by ${Math.abs(diffDays)} day${Math.abs(diffDays) !== 1 ? 's' : ''}`;
+      } else if (diffDays === 0) {
+        return 'Due today';
+      } else {
+        return `${diffDays} day${diffDays !== 1 ? 's' : ''} remaining`;
+      }
+    } catch (e) {
+      return '';
+    }
+  };
+
   return (
-    <div className="task-card">
+    <div className={`task-card ${getCardClass(task.status)}`}>
       <div className="task-card__header">
         <h3 className="task-card__title">{task.title}</h3>
         <span className={`task-card__status ${getStatusClass(task.status)}`}>
@@ -69,20 +113,27 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
       )}
 
       <div className="task-card__meta">
-        <span className="task-card__date">Due: {formatDate(task.dueDate)}</span>
-        <span className="task-card__date">Created: {formatDate(task.createdAt)}</span>
+        <span className="task-card__date task-card__date--due">
+          Due: {formatDate(task.dueDate)}
+          <small style={{ marginLeft: '8px', fontStyle: 'italic' }}>
+            ({getDaysRemaining(task.dueDate)})
+          </small>
+        </span>
+        <span className="task-card__date">
+          Created: {formatDate(task.createdAt)}
+        </span>
       </div>
 
       <div className="task-card__actions">
-        <button 
-          className="btn btn--secondary" 
+        <button
+          className="btn btn--secondary btn--icon btn--edit"
           onClick={onEdit}
           aria-label="Edit task"
         >
           Edit
         </button>
-        <button 
-          className="btn btn--danger" 
+        <button
+          className="btn btn--danger btn--icon btn--delete"
           onClick={onDelete}
           aria-label="Delete task"
         >

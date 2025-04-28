@@ -13,10 +13,10 @@ const TaskList: React.FC = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // State for task filters
   const [filterStatus, setFilterStatus] = useState<string>('ALL');
-  
+
   // State for modals
   const [showCreateModal, setShowCreateModal] = useState<boolean>(false);
   const [showEditModal, setShowEditModal] = useState<boolean>(false);
@@ -72,7 +72,7 @@ const TaskList: React.FC = () => {
    */
   const handleUpdateTask = async (taskData: any) => {
     if (!selectedTask) return;
-    
+
     try {
       await TaskService.updateTask(selectedTask.id, taskData);
       setShowEditModal(false);
@@ -89,7 +89,7 @@ const TaskList: React.FC = () => {
    */
   const handleDeleteTask = async () => {
     if (!selectedTask) return;
-    
+
     try {
       await TaskService.deleteTask(selectedTask.id);
       setShowDeleteModal(false);
@@ -121,8 +121,8 @@ const TaskList: React.FC = () => {
     <div className="task-management">
       <div className="task-management__header">
         <h1>Task Management</h1>
-        <button 
-          className="btn btn--primary"
+        <button
+          className="btn btn--primary btn--icon btn--add"
           onClick={() => setShowCreateModal(true)}
         >
           Add New Task

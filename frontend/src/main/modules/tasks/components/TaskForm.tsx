@@ -192,7 +192,7 @@ const TaskForm: React.FC<TaskFormProps> = ({
             <button type="button" className="btn btn--secondary" onClick={onClose}>
               Cancel
             </button>
-            <button type="submit" className="btn btn--primary">
+            <button type="submit" className="btn btn--primary btn--lg">
               {initialData ? 'Update Task' : 'Create Task'}
             </button>
           </div>

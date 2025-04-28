@@ -24,8 +24,8 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
       <div className="modal__content">
         <div className="modal__header">
           <h2>Delete Task</h2>
-          <button 
-            className="modal__close" 
+          <button
+            className="modal__close"
             onClick={onClose}
             aria-label="Close modal"
           >
@@ -33,18 +33,22 @@ const DeleteConfirmation: React.FC<DeleteConfirmationProps> = ({
           </button>
         </div>
 
-        <div>
-          <p>Are you sure you want to delete the task: <strong>{taskTitle}</strong>?</p>
-          <p>This action cannot be undone.</p>
-        </div>
+        <div className="delete-confirmation">
+          <div className="delete-confirmation__icon">🗑️</div>
+          <h3 className="delete-confirmation__title">Delete Task</h3>
+          <p className="delete-confirmation__message">
+            Are you sure you want to delete the task: <strong>{taskTitle}</strong>?<br />
+            This action cannot be undone.
+          </p>
 
-        <div className="task-form__actions">
-          <button type="button" className="btn btn--secondary" onClick={onClose}>
-            Cancel
-          </button>
-          <button type="button" className="btn btn--danger" onClick={onConfirm}>
-            Delete
-          </button>
+          <div className="delete-confirmation__actions">
+            <button type="button" className="btn btn--secondary" onClick={onClose}>
+              Cancel
+            </button>
+            <button type="button" className="btn btn--danger btn--icon btn--delete" onClick={onConfirm}>
+              Delete
+            </button>
+          </div>
         </div>
       </div>
     </div>
