@@ -1,0 +1,6 @@
+# macOS
+.DS_Store
+
+# Node/IDE
+node_modules/
+dist/
