@@ -35,25 +35,25 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class TaskControllerTest {
 
     private MockMvc mockMvc;
-    
+
     @Mock
     private TaskService taskService;
-    
+
     @InjectMocks
     private TaskController taskController;
-    
+
     private ObjectMapper objectMapper;
-    
+
     @BeforeEach
     public void setup() {
         mockMvc = MockMvcBuilders.standaloneSetup(taskController)
             .setControllerAdvice(new GlobalExceptionHandler())
             .build();
-        
+
         objectMapper = new ObjectMapper();
         objectMapper.findAndRegisterModules(); // For proper LocalDateTime serialization
     }
-    
+
     @Test
     public void getAllTasks_ShouldReturnAllTasks() throws Exception {
         // Arrange
@@ -62,11 +62,11 @@ public class TaskControllerTest {
         Task task2 = new Task("Task 2", "Description 2", TaskStatus.IN_PROGRESS, LocalDateTime.now().plusDays(2));
         task2.setId(2L);
         List<Task> tasks = Arrays.asList(task1, task2);
-        
+
         when(taskService.getAllTasks()).thenReturn(tasks);
-        
+
         // Act & Assert
-        mockMvc.perform(get("/api/tasks"))
+        mockMvc.perform(get("/tasks"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$", hasSize(2)))
@@ -75,17 +75,17 @@ public class TaskControllerTest {
             .andExpect(jsonPath("$[1].id", is(2)))
             .andExpect(jsonPath("$[1].title", is("Task 2")));
     }
-    
+
     @Test
     public void getTaskById_WithValidId_ShouldReturnTask() throws Exception {
         // Arrange
         Task task = new Task("Task 1", "Description 1", TaskStatus.TODO, LocalDateTime.now().plusDays(1));
         task.setId(1L);
-        
+
         when(taskService.getTaskById(1L)).thenReturn(task);
-        
+
         // Act & Assert
-        mockMvc.perform(get("/api/tasks/1"))
+        mockMvc.perform(get("/tasks/1"))
             .andExpect(status().isOk())
             .andExpect(content().contentType(MediaType.APPLICATION_JSON))
             .andExpect(jsonPath("$.id", is(1)))
@@ -93,17 +93,17 @@ public class TaskControllerTest {
             .andExpect(jsonPath("$.description", is("Description 1")))
             .andExpect(jsonPath("$.status", is("TODO")));
     }
-    
+
     @Test
     public void getTaskById_WithInvalidId_ShouldReturnNotFound() throws Exception {
         // Arrange
         when(taskService.getTaskById(999L)).thenThrow(new EntityNotFoundException("Task not found with ID: 999"));
-        
+
         // Act & Assert
-        mockMvc.perform(get("/api/tasks/999"))
+        mockMvc.perform(get("/tasks/999"))
             .andExpect(status().isNotFound());
     }
-    
+
     @Test
     public void createTask_WithValidData_ShouldReturnCreatedTask() throws Exception {
         // Arrange
@@ -113,7 +113,7 @@ public class TaskControllerTest {
             TaskStatus.TODO,
             LocalDateTime.now().plusDays(1)
         );
-        
+
         Task createdTask = new Task(
             taskRequest.getTitle(),
             taskRequest.getDescription(),
@@ -121,11 +121,11 @@ public class TaskControllerTest {
             taskRequest.getDueDate()
         );
         createdTask.setId(1L);
-        
+
         when(taskService.createTask(any(TaskRequest.class))).thenReturn(createdTask);
-        
+
         // Act & Assert
-        mockMvc.perform(post("/api/tasks")
+        mockMvc.perform(post("/tasks")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(taskRequest)))
             .andExpect(status().isCreated())
@@ -135,7 +135,7 @@ public class TaskControllerTest {
             .andExpect(jsonPath("$.description", is("New Description")))
             .andExpect(jsonPath("$.status", is("TODO")));
     }
-    
+
     @Test
     public void updateTask_WithValidIdAndData_ShouldReturnUpdatedTask() throws Exception {
         // Arrange
@@ -145,7 +145,7 @@ public class TaskControllerTest {
             TaskStatus.IN_PROGRESS,
             LocalDateTime.now().plusDays(2)
         );
-        
+
         Task updatedTask = new Task(
             taskRequest.getTitle(),
             taskRequest.getDescription(),
@@ -153,11 +153,11 @@ public class TaskControllerTest {
             taskRequest.getDueDate()
         );
         updatedTask.setId(1L);
-        
+
         when(taskService.updateTask(eq(1L), any(TaskRequest.class))).thenReturn(updatedTask);
-        
+
         // Act & Assert
-        mockMvc.perform(put("/api/tasks/1")
+        mockMvc.perform(put("/tasks/1")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(taskRequest)))
             .andExpect(status().isOk())
@@ -167,7 +167,7 @@ public class TaskControllerTest {
             .andExpect(jsonPath("$.description", is("Updated Description")))
             .andExpect(jsonPath("$.status", is("IN_PROGRESS")));
     }
-    
+
     @Test
     public void updateTask_WithInvalidId_ShouldReturnNotFound() throws Exception {
         // Arrange
@@ -177,29 +177,29 @@ public class TaskControllerTest {
             TaskStatus.IN_PROGRESS,
             LocalDateTime.now().plusDays(2)
         );
-        
+
         when(taskService.updateTask(eq(999L), any(TaskRequest.class)))
             .thenThrow(new EntityNotFoundException("Task not found with ID: 999"));
-        
+
         // Act & Assert
-        mockMvc.perform(put("/api/tasks/999")
+        mockMvc.perform(put("/tasks/999")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(taskRequest)))
             .andExpect(status().isNotFound());
     }
-    
+
     @Test
     public void updateTaskStatus_WithValidIdAndStatus_ShouldReturnUpdatedTask() throws Exception {
         // Arrange
         TaskStatusRequest statusRequest = new TaskStatusRequest(TaskStatus.COMPLETED);
-        
+
         Task updatedTask = new Task("Task 1", "Description 1", TaskStatus.COMPLETED, LocalDateTime.now().plusDays(1));
         updatedTask.setId(1L);
-        
+
         when(taskService.updateTaskStatus(eq(1L), eq(TaskStatus.COMPLETED))).thenReturn(updatedTask);
-        
+
         // Act & Assert
-        mockMvc.perform(patch("/api/tasks/1/status")
+        mockMvc.perform(patch("/tasks/1/status")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(statusRequest)))
             .andExpect(status().isOk())
@@ -207,37 +207,37 @@ public class TaskControllerTest {
             .andExpect(jsonPath("$.id", is(1)))
             .andExpect(jsonPath("$.status", is("COMPLETED")));
     }
-    
+
     @Test
     public void updateTaskStatus_WithInvalidId_ShouldReturnNotFound() throws Exception {
         // Arrange
         TaskStatusRequest statusRequest = new TaskStatusRequest(TaskStatus.COMPLETED);
-        
+
         when(taskService.updateTaskStatus(eq(999L), eq(TaskStatus.COMPLETED)))
             .thenThrow(new EntityNotFoundException("Task not found with ID: 999"));
-        
+
         // Act & Assert
-        mockMvc.perform(patch("/api/tasks/999/status")
+        mockMvc.perform(patch("/tasks/999/status")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(statusRequest)))
             .andExpect(status().isNotFound());
     }
-    
+
     @Test
     public void deleteTask_WithValidId_ShouldReturnNoContent() throws Exception {
         // Act & Assert
-        mockMvc.perform(delete("/api/tasks/1"))
+        mockMvc.perform(delete("/tasks/1"))
             .andExpect(status().isNoContent());
     }
-    
+
     @Test
     public void deleteTask_WithInvalidId_ShouldReturnNotFound() throws Exception {
         // Arrange
         doThrow(new EntityNotFoundException("Task not found with ID: 999"))
             .when(taskService).deleteTask(999L);
-        
+
         // Act & Assert
-        mockMvc.perform(delete("/api/tasks/999"))
+        mockMvc.perform(delete("/tasks/999"))
             .andExpect(status().isNotFound());
     }
 }
