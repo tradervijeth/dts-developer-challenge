@@ -8,6 +8,7 @@ interface TaskFormProps {
   onSubmit: (data: any) => void;
   title: string;
   initialData?: Task;
+  error?: string | null;
 }
 
 /**
@@ -18,7 +19,8 @@ const TaskForm: React.FC<TaskFormProps> = ({
   onClose,
   onSubmit,
   title,
-  initialData
+  initialData,
+  error
 }) => {
   // Form state
   const [formData, setFormData] = useState({
@@ -51,14 +53,14 @@ const TaskForm: React.FC<TaskFormProps> = ({
    */
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev: any) => ({
       ...prev,
       [name]: value
     }));
 
     // Clear validation errors when field is updated
     if (errors[name as keyof typeof errors]) {
-      setErrors(prev => ({
+      setErrors((prev: any) => ({
         ...prev,
         [name]: ''
       }));
@@ -104,15 +106,34 @@ const TaskForm: React.FC<TaskFormProps> = ({
     e.preventDefault();
 
     if (validateForm()) {
-      // Ensure the date is in the correct format for the API
-      const formattedData = {
-        title: formData.title,
-        description: formData.description || undefined,
-        status: formData.status,
-        dueDate: formData.dueDate // Format: yyyy-MM-dd'T'HH:mm
-      };
-      console.log('Submitting task with data:', formattedData);
-      onSubmit(formattedData);
+      try {
+        // Parse the date to ensure it's in the correct format
+        const dueDateObj = new Date(formData.dueDate);
+
+        // Format the date in the exact format expected by the backend: yyyy-MM-dd'T'HH:mm
+        // This format matches what's defined in TaskRequest.java with @JsonFormat
+        const formattedDate = format(dueDateObj, "yyyy-MM-dd'T'HH:mm");
+
+        // Make a copy of the form data to avoid modifying the original state
+        const formattedData = {
+          title: formData.title.trim(),
+          description: formData.description ? formData.description.trim() : "",
+          status: formData.status,
+          dueDate: formattedDate // Properly formatted date
+        };
+
+        console.log('Submitting task with data:', formattedData);
+        console.log('Due date format being sent:', formattedData.dueDate);
+
+        // Submit the formatted data
+        onSubmit(formattedData);
+      } catch (error) {
+        console.error('Error formatting date:', error);
+        setErrors((prev: any) => ({
+          ...prev,
+          dueDate: 'Invalid date format. Please try again.'
+        }));
+      }
     }
   };
 
@@ -132,6 +153,12 @@ const TaskForm: React.FC<TaskFormProps> = ({
             &times;
           </button>
         </div>
+
+        {error && (
+          <div className="task-form__error-banner">
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit} className="task-form">
           <div className="task-form__group">

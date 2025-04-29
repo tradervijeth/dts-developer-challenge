@@ -6,9 +6,11 @@ import TaskList from './components/TaskList';
  */
 const TaskPage: React.FC = () => {
   return (
-    <div className="govuk-width-container">
+    <div className="govuk-width-container task-page-container">
       <main className="govuk-main-wrapper" id="main-content" role="main">
-        <TaskList />
+        <div className="task-page-content">
+          <TaskList />
+        </div>
       </main>
     </div>
   );
