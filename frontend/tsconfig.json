@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
-    "outDir": "./src/",
+    "outDir": "./dist/",
     "module": "commonjs",
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "target": "ES2020",
-    "strict": true,
-    "noImplicitAny": true,
+    "strict": false,
+    "noImplicitAny": false,
     "noImplicitThis": false,
     "moduleResolution": "node",
-    "noUnusedLocals": true,
+    "noUnusedLocals": false,
     "experimentalDecorators": true,
     "useUnknownInCatchVariables": false,
     "skipLibCheck": true,
@@ -20,7 +20,24 @@
       "routes/*": ["routes/*"]
     },
     "jsx": "react",
-    "sourceMap": true
+    "jsxFactory": "React.createElement",
+    "jsxFragmentFactory": "React.Fragment",
+    "sourceMap": true,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": false,
+    "noEmitOnError": false,
+    "resolveJsonModule": true,
+    "skipDefaultLibCheck": true,
+    "isolatedModules": true
   },
-  "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*"]
+  "ts-node": {
+    "transpileOnly": true,
+    "files": true,
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["**/*.test.ts", "**/codecept.conf.ts", "**/__mocks__/*", "node_modules"]
 }

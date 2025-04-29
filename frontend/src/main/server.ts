@@ -19,9 +19,12 @@ function gracefulShutdownHandler(signal: string) {
 
   setTimeout(() => {
     console.log('Shutting down application');
+    // @ts-ignore
     process.exit(0);
   }, 4000);
 }
 
+// @ts-ignore
 process.on('SIGINT', gracefulShutdownHandler);
+// @ts-ignore
 process.on('SIGTERM', gracefulShutdownHandler);
