@@ -1,5 +1,6 @@
 import React from 'react';
 import { format } from 'date-fns';
+import { enGB } from 'date-fns/locale';
 import { Task, TaskStatus } from '../../../types/Task';
 
 interface TaskCardProps {
@@ -61,11 +62,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
   };
 
   /**
-   * Format dates for display
+   * Format dates for display in British format (dd/MM/yyyy)
    */
   const formatDate = (dateString: string): string => {
     try {
-      return format(new Date(dateString), 'PPP');
+      // Use the British locale and format pattern
+      return format(new Date(dateString), 'dd/MM/yyyy', { locale: enGB });
     } catch (e) {
       return 'Invalid date';
     }
@@ -114,13 +116,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, onEdit, onDelete }) => {
 
       <div className="task-card__meta">
         <span className="task-card__date task-card__date--due">
-          Due: {formatDate(task.dueDate)}
-          <small style={{ marginLeft: '8px', fontStyle: 'italic' }}>
+          <strong>Due:</strong> {formatDate(task.dueDate)}
+          <small className="task-card__date-remaining">
             ({getDaysRemaining(task.dueDate)})
           </small>
         </span>
         <span className="task-card__date">
-          Created: {formatDate(task.createdAt)}
+          <strong>Created:</strong> {formatDate(task.createdAt)}
         </span>
       </div>
 

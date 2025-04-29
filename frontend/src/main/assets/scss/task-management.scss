@@ -2,6 +2,7 @@
 
 .task-management {
   margin-top: 30px;
+  overflow: visible; /* Ensure content can overflow for the colored borders */
 
   &__header {
     display: flex;
@@ -41,7 +42,10 @@
   &__list {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 20px;
+    gap: 24px;
+    overflow: visible; /* Ensure content can overflow for the colored borders */
+    position: relative; /* Establish positioning context */
+    padding: 0; /* Remove any padding that might affect the borders */
   }
 
   &__empty {
@@ -61,37 +65,96 @@
 .task-card {
   background: white;
   border: 1px solid #ddd;
-  border-radius: 4px;
-  padding: 15px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 0;
+  padding: 16px 16px 16px 20px; /* Increase left padding to prevent content from overlapping border */
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+  border-left: none;
+  border-right: none;
+  border-bottom: none;
+  overflow: visible; /* Allow content to be visible */
+
+  /* Use ::before for the colored border to ensure it's behind the content */
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 5px;
+    height: 100%;
+    background-color: transparent;
+    z-index: 1;
+  }
+
+  // Add colored border on the left side based on status
+  &--todo::before {
+    background-color: #ffdd00;
+  }
+
+  &--in-progress::before {
+    background-color: #1d70b8;
+  }
+
+  &--completed::before {
+    background-color: #00703c;
+  }
 
   &__header {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 10px;
+    align-items: flex-start;
+    margin-bottom: 12px;
   }
 
   &__title {
-    margin: 0 0 10px;
+    margin: 0 0 8px;
     font-size: 18px;
     font-weight: 600;
+    line-height: 1.3;
   }
 
   &__description {
-    margin: 0 0 15px;
+    margin: 0 0 16px;
     color: #555;
     font-size: 14px;
+    line-height: 1.5;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
   }
 
   &__meta {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
+    flex-direction: column;
+    margin-bottom: 16px;
     font-size: 14px;
+    gap: 6px;
+    background-color: #f8f8f8;
+    padding: 10px;
+    border-radius: 4px;
   }
 
   &__date {
+    color: #666;
+
+    strong {
+      margin-right: 4px;
+    }
+
+    &--due {
+      font-weight: 500;
+    }
+  }
+
+  &__date-remaining {
+    margin-left: 4px;
+    font-style: italic;
+    font-size: 12px;
     color: #666;
   }
 
@@ -101,6 +164,9 @@
     border-radius: 4px;
     font-size: 12px;
     font-weight: 600;
+    white-space: nowrap;
+    text-align: center;
+    min-width: 90px;
 
     &--todo {
       background-color: #ffdd00;
@@ -122,6 +188,8 @@
     display: flex;
     justify-content: flex-end;
     gap: 10px;
+    margin-top: auto;
+    padding-top: 10px;
   }
 }
 
@@ -155,6 +223,16 @@
     color: #d4351c;
     font-size: 14px;
     margin-top: 5px;
+  }
+
+  &__error-banner {
+    background-color: #f3dede;
+    border: 1px solid #d4351c;
+    color: #d4351c;
+    padding: 10px 15px;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    font-weight: 600;
   }
 
   &__actions {
@@ -214,23 +292,30 @@
 .btn {
   padding: 8px 16px;
   border-radius: 4px;
-  border: none;
+  border: 1px solid transparent;
   font-weight: 600;
+  font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 
   &--primary {
     background-color: #1d70b8;
     color: white;
+    border-color: #1d70b8;
 
     &:hover {
       background-color: #144e7c;
+      border-color: #144e7c;
     }
   }
 
   &--secondary {
     background-color: #f3f2f1;
     color: #0b0c0c;
+    border-color: #dbdad9;
 
     &:hover {
       background-color: #dbdad9;
@@ -240,10 +325,24 @@
   &--danger {
     background-color: #d4351c;
     color: white;
+    border-color: #d4351c;
 
     &:hover {
       background-color: #aa2a16;
+      border-color: #aa2a16;
     }
+  }
+
+  &--icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  &--lg {
+    padding: 10px 20px;
+    font-size: 16px;
   }
 }
 
@@ -264,6 +363,29 @@
 
     &__list {
       grid-template-columns: 1fr;
+      gap: 16px;
+    }
+  }
+
+  .task-card {
+    padding: 14px 14px 14px 18px; /* Maintain increased left padding on mobile */
+
+    &__title {
+      font-size: 16px;
+    }
+
+    &__meta {
+      padding: 8px;
+    }
+
+    &__actions {
+      flex-direction: row;
+      justify-content: space-between;
+      width: 100%;
+
+      button {
+        flex: 1;
+      }
     }
   }
 
