@@ -2,6 +2,7 @@ package uk.gov.hmcts.reform.dev.controllers;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -22,7 +23,8 @@ import uk.gov.hmcts.reform.dev.services.TaskService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/tasks")
+@RequestMapping("/tasks")
+@Slf4j
 public class TaskController {
 
     private final TaskService taskService;
@@ -39,7 +41,10 @@ public class TaskController {
      */
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks() {
-        return ResponseEntity.ok(taskService.getAllTasks());
+        log.info("Received request to get all tasks");
+        List<Task> tasks = taskService.getAllTasks();
+        log.info("Returning {} tasks", tasks.size());
+        return ResponseEntity.ok(tasks);
     }
 
     /**
@@ -65,8 +70,15 @@ public class TaskController {
      */
     @PostMapping
     public ResponseEntity<Task> createTask(@Valid @RequestBody TaskRequest taskRequest) {
-        Task createdTask = taskService.createTask(taskRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+        log.info("Received task creation request: {}", taskRequest);
+        try {
+            Task createdTask = taskService.createTask(taskRequest);
+            log.info("Task created successfully: {}", createdTask);
+            return ResponseEntity.status(HttpStatus.CREATED).body(createdTask);
+        } catch (Exception e) {
+            log.error("Error creating task: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     /**

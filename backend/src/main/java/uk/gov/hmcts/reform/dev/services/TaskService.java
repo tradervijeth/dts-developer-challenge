@@ -1,6 +1,7 @@
 package uk.gov.hmcts.reform.dev.services;
 
 import jakarta.persistence.EntityNotFoundException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.reform.dev.models.task.Task;
@@ -11,6 +12,7 @@ import uk.gov.hmcts.reform.dev.repositories.TaskRepository;
 import java.util.List;
 
 @Service
+@Slf4j
 public class TaskService {
 
     private final TaskRepository taskRepository;
@@ -48,8 +50,17 @@ public class TaskService {
      * @return The created task
      */
     public Task createTask(TaskRequest taskRequest) {
-        Task task = taskRequest.toTask();
-        return taskRepository.save(task);
+        log.info("Creating task with data: {}", taskRequest);
+        try {
+            Task task = taskRequest.toTask();
+            log.info("Converted TaskRequest to Task: {}", task);
+            Task savedTask = taskRepository.save(task);
+            log.info("Task saved successfully: {}", savedTask);
+            return savedTask;
+        } catch (Exception e) {
+            log.error("Error creating task: {}", e.getMessage(), e);
+            throw e;
+        }
     }
 
     /**
@@ -62,12 +73,12 @@ public class TaskService {
      */
     public Task updateTask(Long id, TaskRequest taskRequest) {
         Task existingTask = getTaskById(id);
-        
+
         existingTask.setTitle(taskRequest.getTitle());
         existingTask.setDescription(taskRequest.getDescription());
         existingTask.setStatus(taskRequest.getStatus());
         existingTask.setDueDate(taskRequest.getDueDate());
-        
+
         return taskRepository.save(existingTask);
     }
 
